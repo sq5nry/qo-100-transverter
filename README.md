@@ -65,6 +65,36 @@
 - [v0.3 schematics (current)](hw-trv/sch_v0.3-sh.pdf)
 - [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in  [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
 
+## Circuit description
+
+### Transmit path
+
+The transceiver signal (up to 5W / +37dBm) passes through a variable 35–42dB attenuator,
+reducing it to approximately −8dBm at the mixer input. A diode protection limiter with a
+clipping level of +4dBm guards the mixer. The signal enters a balanced
+Gilbert-cell mixer (RFFC2071), whose output is filtered by a 2.4GHz bandpass filter to
+suppress LO leakage and the image frequency. A driver stage amplifies the signal to +12dBm,
+followed by a 29dB LDMOS power amplifier and a low-pass filter, delivering +38dBm (6W) to
+the TX output socket. Interstage 1dB and 3dB fixed attenuation pads improve impedance
+matching, distribute gain, and improve amplifier stability.
+
+### Receive path
+
+LNB power is supplied via a bias-T with sufficient RF isolation at 738MHz and also the 25MHz reference signal (and its harmonics up to 125MHz). The reference signal is low-pass filtered to 125MHz before injection. The
+received 738MHz IF from the LNB passes through a high-pass filter and two cascaded SAW
+filters centred around 738MHz, then reaches an optional signal splitter. The signal can be
+routed to the receive mixer or directed to the external AUX socket. From the mixer output
+the signal passes through a PIN diode switch to the shared TRX socket. A fixed input
+attenuator is always present on the RX path — enable the RX preamplifier in your
+transceiver to compensate.
+
+### Control
+
+The STM32L0 microcontroller configures the RFFC2071 PLL for the RX and TX local oscillator
+frequencies corresponding to the IF band selected by the DIP switch. On PTT transitions,
+the firmware switches between the TX and RX PLL register banks in the RFFC2071. The PTT
+signal can originate from a physical PTT line or be detected from the coax (PTT-over-coax).
+
 ## Jumper configuration
 
 ### Jumper reference
