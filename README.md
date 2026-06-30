@@ -49,7 +49,7 @@
 - Standard universal LNB (13/18V), 500mA fused
 - Standard PTT ground-to-transmit, or
 - PTT-over-coax by transceiver or using the Companion Box to mix PTT and RF
-- Operation from 13.8V (1.1A) directly is possible with lower output power (2W max). Adequate linearity is  not guaranteed.
+- Operation from 13.8V (1.1A) directly is possible with lower output power (2W max). Adequate linearity is not guaranteed.
 
 ### Basic procedures
 
@@ -57,7 +57,7 @@
 2. IF can be updated on-the-fly, the change is indicated by a flashing green LED.
 3. Connect DC power and PTT signal.
 4. Switch on RX pre-amp in your transceiver.
-5. Check position of the received QO-100 mid beacon, adjust it to fall into the middle of the band using REF ADJ control with a small flat-head screwdriver.
+5. Check the position of the received QO-100 mid beacon, adjust it to fall into the middle of the band using REF ADJ control with a small flat-head screwdriver.
 6. Set your transceiver output power to 3–5W and adjust TX ATT control so that your signal is at the mid-beacon level. Lower power with a higher TX ATT setting is advised to minimize heat dissipation inside the transverter.
 
 ## Schematics
@@ -123,6 +123,28 @@ After reflow and cooldown, inspect all joints under magnification:
 Solder the 5W power resistor by hand after SMD reflow. Mount the TCVCXO with polyester
 tape and foam fitting as described in the enclosure assembly notes.
 
+### EMI shields
+
+The PCB has footprints for SMD metal EMI shields over sensitive sections. Whether to fit
+them depends on the enclosure:
+
+- **Outdoor version (Hammond 1590XX die-cast aluminium enclosure):** do **not** fit EMI
+  shields except over the reference oscillator. The cast enclosure itself provides effective
+  shielding. Fitting additional shields in vicinity of PA can cause instability due to
+  altered parasitic coupling.
+- **Bare-board, cabinet, and outdoor-deluxe versions:** all EMI shields may be installed.
+  They serve primarily as mechanical protection for small components in these configurations.
+  For cabinet and outdoor-deluxe versions, fitting RF absorption foam on the inner face of
+  the enclosure lid is strongly recommended — without it, reflections from the lid may
+  affect PA stability.
+
+### PCB cleaning
+
+Wash the assembled PCB thoroughly with isopropanol to remove all flux residues before
+proceeding. Flux contamination on the board surface can significantly affect 2.4GHz circuit
+behaviour — altering tuning, increasing losses, and making RF adjustments unreliable.
+Allow the board to dry completely before applying power.
+
 ### Power-up and initial checks
 
 Connect power and PTT cables. Supply 28V with the current limit set to 50mA. Measure the
@@ -155,12 +177,14 @@ Before adjusting, raise the lab supply's overload protection (current limit) to 
 To measure Idq, cut the respective drain supply PCB trace and insert an ammeter in series or just calculate current delta on the lab supply.
 Adjust the bias trimmer for each stage until the target Idq is reached, then bridge the cut
 with solder.
+Try higher settings like 24mA/150mA for possibly better linearity, 1dB more gain but higher power consumption.
+Adjust position of C87 in PA output circuit for highest stage gain.
 
 ### PA gain and output matching
 
-Measure the PA gain and adjust the position of C88 to obtain **28–30dB** gain. Do not mount
+Measure the PA gain and adjust the position of C88 to obtain **28–30dB** gain. Add 0.8pF in parallel to C88 in case shifting this cap to the end to the thicker part of the output line didn't maximize the gain. Do not mount
 the low-pass filter (LPF) elements yet — bridge the LPF inductor footprint with a strip of
-copper foil instead, so the PA output can be measured without the filter's insertion loss.
+copper foil instead, so the PA output can be measured without the potentially mismatched filter.
 
 Once the gain is set, mount the LPF inductor and adjust it for a maximum insertion loss of
 **1dB at 2.4GHz**.
@@ -170,8 +194,15 @@ Set the overload (overcurrent) protection threshold to **1.1A**.
 Connect an RF power meter to the 2.4GHz TX output socket and adjust the TX path for **6W**
 output across your expected input power range (1–5W).
 
-> **Warning:** do not drive the PA past **8W** output — exceeding this limit pushes the
+> **⚠️ Warning:** do not increase input power in an attempt to reach 6W until PA gain is at least 28dB. PA chip will overheat and operate non-linearly.
+
+> **⚠️ Warning:** do not drive the PA past **8W** output — exceeding this limit pushes the
 > stage into non-linear operation, causing spectral splatter and interference to other users.
+
+> **⚠️ Note:** the PA chip tolerates antenna mismatch well — SWR up to 10:1 on the 2.4GHz
+> TX port will not damage it. However, operating with no load connected may cause
+> self-oscillation in the 2.2–2.5GHz range; the on-board 1.5A resettable fuse will limit
+> the resulting current in that event.
 
 ## Circuit description
 
@@ -179,22 +210,33 @@ output across your expected input power range (1–5W).
 
 The transceiver signal (up to 5W / +37dBm) passes through a variable 35–42dB attenuator,
 reducing it to approximately −8dBm at the mixer input. A diode protection limiter with a
-clipping level of +4dBm guards the mixer. The signal enters a balanced
-Gilbert-cell mixer (RFFC2071), whose output is filtered by a 2.4GHz bandpass filter to
-suppress LO leakage and the image frequency. A driver stage amplifies the signal to +12dBm,
-followed by a 29dB LDMOS power amplifier and a low-pass filter, delivering +38dBm (6W) to
-the TX output socket. Interstage 1dB and 3dB fixed attenuation pads improve impedance
-matching, distribute gain, and improve amplifier stability.
+clipping level starting softly at +4dBm guards the mixer — this is to limit damage in case you connect 100W for a longer time. Note that sustained high-power overshoots may still damage the PA by exceeding its maximum input level even if the mixer itself survives. \
+The signal enters a balanced Gilbert-cell mixer (RFFC2071). The mixer's wideband 4:1 output transformer provides differential symmetry that helps cancel LO leakage, minimising it before the signal
+even reaches the downstream filter. Although slightly more expensive than a narrowband balun
+chip, the wideband transformer's superior symmetry keeps LO leakage below −32dBc relative
+to the upper sideband with only two SAW filters — most critically on the 29MHz band, where
+LO leakage lands closest to occupied spectrum. The TX mixer on 10m is intentionally operated at a reduced bias current, which directly reduces LO leakage at its output. \
+The output is filtered by a 2.4GHz bandpass filter to further suppress any residual LO leakage and the image frequency. The two TX bandpass filters are inter-stage matched using a parallel 0.8pF capacitor; this matching network optimises power transfer between the filter sections and consistently yields a +1dB
+improvement. This node operates at a characteristic
+impedance of 37Ω. A driver stage amplifies the signal to +12dBm,
+followed by a 29dB LDMOS power amplifier — whose input is matched to 50Ω using a short high-impedance transmission line — and a low-pass filter, delivering +38dBm (6W) to
+the TX output socket. \
+Interstage 1dB and 3dB fixed attenuation pads improve impedance
+matching, distribute gain, and improve amplifier stability. Their 50Ω terminations also
+provide convenient probe attachment points when measuring gain between individual stages. \
+Image attenuation is 40dB on 10m.
+Total conversion gain is 2-9dB, about 0.8-4W from TRX will produce 6W output.
 
 ### Receive path
 
-LNB power is supplied via a bias-T with sufficient RF isolation at 738MHz and also the 25MHz reference signal (and its harmonics up to 125MHz). The reference signal is low-pass filtered to 125MHz before injection. The
-received 738MHz IF from the LNB passes through a high-pass filter and two cascaded SAW
-filters centred around 738MHz, then reaches an optional signal splitter. The signal can be
-routed to the receive mixer or directed to the external AUX socket. From the mixer output
-the signal passes through a PIN diode switch to the shared TRX socket. A fixed input
-attenuator is always present on the RX path — enable the RX preamplifier in your
-transceiver to compensate.
+Both the LNB supply voltage and the 25MHz reference signal (along with its harmonics up to 125MHz) are injected via a bias-T, which must provide sufficient RF isolation across the full 25–738MHz range where these signals share the same junction. The reference signal is low-pass filtered to 125MHz before injection. \
+The received 738MHz IF from the LNB passes through a high-pass filter (so as not to hammer the input SAW filters with the reference oscillator) and two cascaded SAW
+filters centred around 738MHz, then reaches an optional signal splitter. \
+The signal can be routed to the receive mixer or directed to the external AUX socket. From the mixer output
+the signal passes through a PIN diode switch to the shared TRX socket. \
+The input attenuator is always present on the RX path — enable the RX preamplifier in your
+transceiver to compensate. Receive path doesn't add amplification (to keep the cost low) and relies on typical LNB signal level so as not yet to degrade SNR with noise from TX chain. \
+Release v0.2 uses resistive splitter but it's advised to use minimum-loss option as in v0.3-sh. If you don't consider RX AUX output, do not mount the splitter parts.
 
 ### Control
 
@@ -204,10 +246,10 @@ the logic switches between the TX and RX PLL register banks in the RFFC2071. The
 signal is a logical OR from the physical PTT line and the coax (PTT-over-coax).
 
 ### Indicators
-The blue LED indicates that PLL synthesizer is in locked state. This means that MCU programmed the PLL, the 25MHz reference oscillator is okay and RX/TX LO frequency is generated for mixers.
-The green LED is blinking on RX and lit when in TX. On startup and IF change it blinks as many times as the IF position in the list (1-8).
 
-## Assembly
+The blue LED indicates that the PLL synthesizer is locked — the MCU has configured the PLL, the 25MHz reference is running, and the LO frequency is being generated.
+
+The green LED blinks in RX mode and is lit continuously in TX mode. On startup and on IF band change, it blinks once per IF position number (1–8).
 
 ## Jumper configuration
 
@@ -216,11 +258,11 @@ The green LED is blinking on RX and lit when in TX. On startup and IF change it 
 | Jumper | Name | Default | Function |
 |--------|------|---------|----------|
 | JP1 | AUX SEL | Reference | Selects what the RX/REF (AUX) socket outputs: **Reference** (25MHz) or **RX** (738MHz) |
-| JP2 | RX SPLIT | no split | Part of RX split — change together with JP4 |
-| JP4 | RX SPLIT | no split | Part of RX split — change together with JP2 |
+| JP2 | RX SPLIT | no-split | Part of RX split — change together with JP4. Change position only if you want RX in AUX socket. |
+| JP4 | RX SPLIT | no-split | Part of RX split — change together with JP2. Change position only if you want RX in AUX socket. |
 | JP5 | OVEN | disconnected | Reserved for OCXO option; disabled in v0.2 |
-| JP6 | REF ROUTE | AUX path | Routes the 25MHz reference toward the AUX socket (default) or toward the LNB feeder (change when using JP7) |
-| JP7 | REF TO LNB | Open | Solder to mix the 25MHz reference signal into the LNB feeder coax |
+| JP6 | REF ROUTE | AUX path | Routes the 25MHz reference toward the AUX socket (default) or toward the LNB feeder (also check JP7) |
+| JP7 | REF TO LNB | open | Solder to mix the 25MHz reference signal into the LNB feeder coax. This jumper enhances signal integrity when REF signal isn't routed to LNB feeder. "Open" when you don't want to mix REF with LNB, "Connected" to inject REF to LNB feeder. |
 
 ### Typical usage scenarios
 
@@ -266,7 +308,9 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 ## Gallery
 
-[▶ Video](https://drive.google.com/file/d/1cbVlMBV8zS9o48hG52KBiPKmD1HPmWjP/view?usp=drive_link)
+[![Video thumbnail](https://drive.google.com/thumbnail?id=1cbVlMBV8zS9o48hG52KBiPKmD1HPmWjP&sz=w640)](https://drive.google.com/file/d/1cbVlMBV8zS9o48hG52KBiPKmD1HPmWjP/view?usp=drive_link)
+
+*Click the image to watch the video.*
 
 ### Finished units
 
@@ -339,16 +383,16 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 <table>
 <tr>
-<td><img src="media/P_20250405_205523.jpg" alt="power supply IC close-up"><br><em>v0.1</em></td>
 <td><img src="media/P_20260527_001843_1.jpg" alt="2.4GHz TX section"></td>
-</tr>
-<tr>
 <td><img src="media/P_20260609_180522.jpg" alt="PCB bottom side"></td>
-<td><img src="media/P_20260602_144805.jpg" alt="v0.2 board populated"></td>
 </tr>
 <tr>
+<td><img src="media/P_20260602_144805.jpg" alt="v0.2 board populated"></td>
 <td><img src="media/DSC_1671.JPG" alt="bare populated v0.2 PCB"></td>
+</tr>
+<tr>
 <td><img src="media/P_20260522_161048.jpg" alt="IC after rework"></td>
+<td></td>
 </tr>
 </table>
 
@@ -356,20 +400,24 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 <table>
 <tr>
-<td><img src="media/P_20250405_231727.jpg" alt="early prototype debugging"><br><em>v0.1</em></td>
-<td><img src="media/P_20250601_133825.jpg" alt="v0.1 bench test"><br><em>v0.1</em></td>
-</tr>
-<tr>
-<td><img src="media/P_20250615_222837.jpg" alt="v0.1 test setup with instruments"><br><em>v0.1</em></td>
-<td><img src="media/P_20250731_152340.jpg" alt="PCB in helping hands during assembly"><br><em>v0.1</em></td>
-</tr>
-<tr>
 <td><img src="media/P_20260209_001514.jpg" alt="RF section prototype"></td>
 <td><img src="media/P_20260209_001531.jpg" alt="multi-board bench integration"></td>
 </tr>
 <tr>
 <td><img src="media/P_20260301_190344.jpg" alt="submodule PCB probing"></td>
 <td><img src="media/P_20260301_214121.jpg" alt="complex integration wiring"></td>
+</tr>
+<tr>
+<td><img src="media/P_20250405_231727.jpg" alt="early prototype debugging"></td>
+<td><img src="media/P_20250601_133825.jpg" alt="v0.1 bench test"></td>
+</tr>
+<tr>
+<td><img src="media/P_20250615_222837.jpg" alt="v0.1 test setup with instruments"></td>
+<td><img src="media/P_20250731_152340.jpg" alt="PCB in helping hands during assembly"></td>
+</tr>
+<tr>
+<td><img src="media/P_20250405_205523.jpg" alt="power supply IC close-up"></td>
+<td></td>
 </tr>
 </table>
 
@@ -415,7 +463,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 </tr>
 </table>
 
-:confounded: :confounded: please note the high TX SWR on 23cm. Only RX was tested okay on this band. Proper TX 23cm testing in progress, it may just work with ALC-limited power from your TRX.
+> **⚠️ Note:** TX SWR on 23cm is high. Only RX has been tested and confirmed on this band. Proper TX 23cm testing is in progress — it may work with ALC-limited power from your transceiver.
 
 ### RX filter
 
@@ -424,6 +472,12 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 ### TCVCXO output spectrum
 
 ![TCXO output spectrum](hw-trv/measurements/tcxo_output_spectrum.png)
+
+## Acknowledgements
+
+- **SP5E Krzysztof** — for the original idea and other discussions
+- **SQ6QV Tomasz** — for consultation
+- **Colleagues from a Radio Club in DOK Ursynów** — for countless discussions
 
 ## License
 
