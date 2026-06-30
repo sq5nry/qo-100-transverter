@@ -35,6 +35,10 @@
 - PTT-over-coax supported
 - Splash-proof outdoor version
 
+## Block diagram
+
+![block-diagram](media/block_diagram.png)
+
 ## Operation
 
 ### Prerequisites
@@ -55,10 +59,6 @@
 4. Switch on RX pre-amp in your transceiver.
 5. Check position of the received QO-100 mid beacon, adjust it to fall into the middle of the band using REF ADJ control with a small flat-head screwdriver.
 6. Set your transceiver output power to 3–5W and adjust TX ATT control so that your signal is at the mid-beacon level. Lower power with a higher TX ATT setting is advised to minimize heat dissipation inside the transverter.
-
-## Block diagram
-
-![block-diagram](media/block_diagram.png)
 
 ## Schematics
 
@@ -102,9 +102,9 @@ signal can originate from a physical PTT line or be detected from the coax (PTT-
 | Jumper | Name | Default | Function |
 |--------|------|---------|----------|
 | JP1 | AUX SEL | Reference | Selects what the RX/REF (AUX) socket outputs: **Reference** (25MHz) or **RX** (738MHz) |
-| JP2 | RX SPLIT | Off | Part of RX split — change together with JP4 |
-| JP4 | RX SPLIT | Off | Part of RX split — change together with JP2 |
-| JP5 | OVEN | — | Reserved for OCXO option; disabled in v0.2 |
+| JP2 | RX SPLIT | no split | Part of RX split — change together with JP4 |
+| JP4 | RX SPLIT | no split | Part of RX split — change together with JP2 |
+| JP5 | OVEN | disconnected | Reserved for OCXO option; disabled in v0.2 |
 | JP6 | REF ROUTE | AUX path | Routes the 25MHz reference toward the AUX socket (default) or toward the LNB feeder (change when using JP7) |
 | JP7 | REF TO LNB | Open | Solder to mix the 25MHz reference signal into the LNB feeder coax |
 
