@@ -123,6 +123,56 @@ After reflow and cooldown, inspect all joints under magnification:
 Solder the 5W power resistor by hand after SMD reflow. Mount the TCVCXO with polyester
 tape and foam fitting as described in the enclosure assembly notes.
 
+### Power-up and initial checks
+
+Connect power and PTT cables. Supply 28V with the current limit set to 50mA. Measure the
+following test points and verify voltages before proceeding:
+
+1. Check 13V and 5V test points first.
+2. If those are correct, verify: 3V (analog), 3V (digital), 3.3V (reference oscillator),
+   3V (MCU), 9V, and 1.8V.
+
+If any rail is missing or out of range, do not proceed — investigate before applying full power.
+
+### Firmware
+
+Flash the firmware using **STM32CubeProgrammer** via the ST-LINK interface and the SWD ISP
+header. A firmware release binary is provided; to build from source use **STM32CubeIDE**.
+
+After programming, the **PLL LOCK** indicator should illuminate. If it does not, check the
+25MHz reference oscillator signal.
+
+### PA bias adjustment
+
+Set the quiescent drain current (Idq) for the 2.4GHz PA stages:
+
+- 1st stage: **15mA**
+- 2nd stage: **75mA**
+
+Before adjusting, raise the lab supply's overload protection (current limit) to about
+**250mA** so it does not trip during bias trimming.
+
+To measure Idq, cut the respective drain supply PCB trace and insert an ammeter in series or just calculate current delta on the lab supply.
+Adjust the bias trimmer for each stage until the target Idq is reached, then bridge the cut
+with solder.
+
+### PA gain and output matching
+
+Measure the PA gain and adjust the position of C88 to obtain **28–30dB** gain. Do not mount
+the low-pass filter (LPF) elements yet — bridge the LPF inductor footprint with a strip of
+copper foil instead, so the PA output can be measured without the filter's insertion loss.
+
+Once the gain is set, mount the LPF inductor and adjust it for a maximum insertion loss of
+**1dB at 2.4GHz**.
+
+Set the overload (overcurrent) protection threshold to **1.1A**.
+
+Connect an RF power meter to the 2.4GHz TX output socket and adjust the TX path for **6W**
+output across your expected input power range (1–5W).
+
+> **Warning:** do not drive the PA past **8W** output — exceeding this limit pushes the
+> stage into non-linear operation, causing spectral splatter and interference to other users.
+
 ## Circuit description
 
 ### Transmit path
@@ -172,7 +222,7 @@ The green LED is blinking on RX and lit when in TX. On startup and IF change it 
 | JP6 | REF ROUTE | AUX path | Routes the 25MHz reference toward the AUX socket (default) or toward the LNB feeder (change when using JP7) |
 | JP7 | REF TO LNB | Open | Solder to mix the 25MHz reference signal into the LNB feeder coax |
 
-### Typical use cases
+### Typical usage scenarios
 
 **1. RX/REF (AUX) socket outputs 25MHz reference** *(default — no changes needed)*
 
@@ -364,6 +414,8 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 <td align="center"><img src="hw-trv/measurements/trv_s11_rx.png" alt="RX port, s11"><br><em>TRX port on RX, s11</em></td>
 </tr>
 </table>
+
+:confounded: :confounded: please note the high TX SWR on 23cm. Only RX was tested okay on this band. Proper TX 23cm testing in progress, it may just work with ALC-limited power from your TRX.
 
 ### RX filter
 
