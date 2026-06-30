@@ -1,0 +1,52 @@
+qo-100-transverter hardware & documentation
+(c) by Paweł Stobiński (https://github.com/sq5nry)
+
+Applies to: the hardware design files in `hw-trv/` and
+`hw-companion-box/` (KiCad schematics/PCB, Qucs and rfslice RF
+simulation projects, measurements), `manual_v0.2.odt`, and the
+README/media documentation. Firmware in `src/` is licensed
+separately — see LICENSE-CODE.
+
+This work is licensed under a
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+You should have received a copy of the license along with this
+work. If not, see <https://creativecommons.org/licenses/by-nc-sa/4.0/>.
+
+Full legal text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+Summary of terms (not a substitute for the full license above):
+
+You are free to:
+  - Share — copy and redistribute the material in any medium or format
+  - Adapt — remix, transform, and build upon the material
+
+Under the following terms:
+  - Attribution — You must give appropriate credit, provide a link to
+    the license, and indicate if changes were made. You may do so in
+    any reasonable manner, but not in any way that suggests the
+    licensor endorses you or your use.
+  - NonCommercial — You may not use the material for commercial
+    purposes.
+  - ShareAlike — If you remix, transform, or build upon the material,
+    you must distribute your contributions under the same license as
+    the original.
+  - No additional restrictions — You may not apply legal terms or
+    technological measures that legally restrict others from doing
+    anything the license permits.
+
+No warranties are given. The license may not give you all of the
+permissions necessary for your intended use.
+
+## Third-party component libraries
+
+`hw-trv/kicad-libs/` contains reference files (not the original
+library packages) pointing to third-party CAD symbol/footprint/3D
+model exports (from SamacSys, Ultra Librarian, and SnapEDA) used
+while designing this project. Those vendor files are NOT included
+in this repository and are NOT covered by this license -- they
+remain under their respective vendors' own terms, which generally
+permit using the parts in your own design but restrict redistributing
+the bare library files themselves. See the `.kicad-lib-source.txt`
+file for each part for sourcing details.
+

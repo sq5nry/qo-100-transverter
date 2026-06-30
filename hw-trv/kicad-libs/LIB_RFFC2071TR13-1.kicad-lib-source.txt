@@ -1,0 +1,23 @@
+Third-party CAD library reference
+============================================================
+
+Original archive: LIB_RFFC2071TR13-1.zip
+Manufacturer:      Qorvo
+Part number:       RFFC2071TR13
+Source:            SamacSys (Component Search Engine / Altium)
+
+This project used a KiCad symbol/footprint/3D-model export for this
+part, downloaded from SamacSys (Component Search Engine / Altium). The raw library package is not
+included in this repository because SamacSys (Component Search Engine / Altium)'s terms restrict
+redistributing their library files as a standalone library outside
+your own use/company (using the part in a finished design is fine
+and unrestricted -- it's redistributing the bare library files that
+isn't).
+
+To get the files yourself: search for "RFFC2071TR13" on:
+  https://componentsearchengine.com
+
+The component as actually used in this design is already present in
+the project's own .kicad_sym / .kicad_pcb files -- you only need to
+re-fetch this archive if you want to edit the symbol/footprint/3D
+model itself, or are missing the library in your local KiCad setup.

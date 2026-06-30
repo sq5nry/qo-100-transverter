@@ -1,0 +1,23 @@
+Third-party 3D model reference
+========================================================
+
+Original file:     B39162B3519U410.STP
+Manufacturer:      TDK (EPCOS)
+Part number:       B39162B3519U410
+Description:       SAW bandpass filter 869 MHz, DCC6C 3x3mm
+
+The 3D model (.STP) for this part is not included in this repository
+because TDK's terms restrict redistribution of their CAD files.
+
+To get the file yourself:
+  1. Go to https://www.tdk.com
+  2. Search for "B39162B3519U410"
+  3. Download the 3D STEP model from the product page
+
+Alternatively, check SnapEDA or Ultra Librarian:
+  https://www.snapeda.com
+  https://www.ultralibrarian.com
+
+The component as actually used in this design is already present in
+the project's own .kicad_pcb files -- you only need to re-fetch this
+file if you want the 3D model visualisation in KiCad.

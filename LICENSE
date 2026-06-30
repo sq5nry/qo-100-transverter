@@ -1,21 +1,31 @@
-MIT License
+qo-100-transverter (c) by Paweł Stobiński (https://github.com/sq5nry)
 
-Copyright (c) 2026 Paweł Stobiński
+This project is dual-licensed by component:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  - Firmware source code (`src/`, excluding bundled third-party
+    vendor drivers) is licensed under the
+    GNU General Public License version 2 (GPL v2) with a
+    commercial exception requiring a separate written licence
+    from the author for any commercial use.
+    See: LICENSE-CODE
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+  - Hardware design files (`hw-trv/`, `hw-companion-box/`),
+    the manual, and documentation/media are licensed under
+    Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+    International (CC BY-NC-SA 4.0).
+    See: LICENSE-HARDWARE
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Both licenses permit free use, modification, and redistribution
+for noncommercial purposes only. Commercial use of any part of
+this project is not permitted without the author's separate
+written permission.
+
+Third-party code bundled under `src/Drivers/` (ST's STM32 HAL
+drivers and ARM's CMSIS headers) remains under its own original
+license terms; see the LICENSE files inside those directories.
+
+`src/Core/Src/rffc5071.c`, `src/Core/Src/rffc5071_spi.c`, and
+associated headers are derived from HackRF
+(https://github.com/greatscottgadgets/hackrf) by Great Scott Gadgets
+and Jared Boone, and are licensed under the GNU General Public
+License version 2 (GPL v2). See: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html

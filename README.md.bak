@@ -1,29 +1,27 @@
 # qo-100-transverter
 
-[![Hardware: CC BY-NC-SA 4.0](https://img.shields.io/badge/Hardware-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE-HARDWARE)
-[![Firmware: GPL v2](https://img.shields.io/badge/Firmware-GPL%20v2%20%2B%20commercial%20exception-blue.svg)](LICENSE-CODE)
-[![GitHub stars](https://img.shields.io/github/stars/sq5nry/qo-100-transverter?style=social)](https://github.com/sq5nry/qo-100-transverter/stargazers)
-
-## What it's about
+## What the project is about
 - source-available, hardware and software project of a SAT transverter. The outdoor version takes 1.5 days to assemble starting from bare PCB, bag of parts, and patience.
-- complete up and down-converter below 199,99 € : [see the BOM](hw-trv/BOM.md)
+- simple up and down-converter below EUR199: [see the BOM](hw-trv/BOM.md)
+- software part is open-source licensed whereas PCB artwork and schematics cannot be used for commercial production.
 - in-fab assembly automation in progress (*v0.3-snapshot*)
 
-## Equipment and skills required
+## What is needed to build, tune and measure it
 - knack for SMD soldering with stencil and solder paste
-- patience for by-hand component placement
-- 10x10 cm heat plate and ability to control the temperature profile
-- multimeter
-- set of fixed attenuators, a variable one and patch cables
+- patience for by-hand component placement onto solder paste deposits
+- 10x10cm heat plate and ability to control the temperature profile
+- a multi-meter
+- set of attenuators and coax cables
+- a variable attenuator
 - VNA+SA and a signal generator up to 3GHz minimum
 - Pluto-like SDR to receive, measure, and generate signals during tests and adjustments
-- RF power meter
+- an RF power meter
 - RF personal protective equipment rated to attenuate 2.4 GHz frequencies
-- 30V 5A lab power supply with over-current protection
+- 30V 5A lab power supply with overcurrent protection
 - ST-link programmer
 - patience for drilling holes in aluminum enclosure
 - patience for tapping 3 mm holes
-- set of sockets (N, F, DC+PTT, UFL)
+- set of sockets (N, F, DC+PTT, UFL) and pieces of coax
 
 ## Features
 - QO-100 narrow-band transponder SSB, CW, and Data operation with an HF-VHF transceiver
@@ -41,11 +39,12 @@
 
 - 28V DC power supply offering 1.1A (31W), or
 - 13.8V DC at 3.5A and using the Companion Box for voltage boost
+- Operation from 13.8V (1.1A) directly is possible with lower output power (2W max)
 - Minimum 60cm dish antenna suggested with 5W ERP according to AMSAT guidelines
 - Standard universal LNB (13/18V), 500mA fused
 - Standard PTT ground-to-transmit, or
 - PTT-over-coax by transceiver or using the Companion Box to mix PTT and RF
-- Operation from 13.8V (1.1A) directly is possible with lower output power (2W max). Adequate linearity is  not guaranteed.
+- Operation from 13.8V (1.1A) directly is possible with lower output power (2W max). Adequate linearity is then not guaranteed.
 
 ### Basic procedures
 
@@ -63,66 +62,9 @@
 ## Schematics
 
 - [v0.3 schematics (current)](hw-trv/sch_v0.3-sh.pdf)
-- [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in  [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
-
-## Jumper configuration
-
-### Jumper reference
-
-| Jumper | Name | Default | Function |
-|--------|------|---------|----------|
-| JP1 | AUX SEL | Reference | Selects what the RX/REF (AUX) socket outputs: **Reference** (25MHz) or **RX** (738MHz) |
-| JP2 | RX SPLIT | Off | Part of RX split — change together with JP4 |
-| JP4 | RX SPLIT | Off | Part of RX split — change together with JP2 |
-| JP5 | OVEN | — | Reserved for OCXO option; disabled in v0.2 |
-| JP6 | REF ROUTE | AUX path | Routes the 25MHz reference toward the AUX socket (default) or toward the LNB feeder (change when using JP7) |
-| JP7 | REF TO LNB | Open | Solder to mix the 25MHz reference signal into the LNB feeder coax |
-
-### Typical use cases
-
-**1. RX/REF (AUX) socket outputs 25MHz reference** *(default — no changes needed)*
-
-Use this to supply 25MHz reference to an external device via the AUX socket.
-
-| JP1 | JP2 | JP4 | JP6 | JP7 |
-|-----|-----|-----|-----|-----|
-| default (Reference) | default | default | default (AUX path) | open |
-
----
-
-**2. 25MHz reference injected into LNB feeder cable**
-
-Use this when the LNB is fed its reference via the coax (no separate reference cable needed).
-
-| JP1 | JP2 | JP4 | JP6 | JP7 |
-|-----|-----|-----|-----|-----|
-| default | default | default | **change (LNB path)** | **solder** |
-
----
-
-**3. RX signal (738MHz) on AUX socket**
-
-Use this to route the received downconverted signal to an external SDR or receiver via the AUX socket.
-
-| JP1 | JP2 | JP4 | JP6 | JP7 |
-|-----|-----|-----|-----|-----|
-| **change (RX)** | **change** | **change** | default | open |
-
----
-
-**4. Reference injected into LNB feeder + RX signal on AUX socket**
-
-Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries the RX signal.
-
-| JP1 | JP2 | JP4 | JP6 | JP7 |
-|-----|-----|-----|-----|-----|
-| **change (RX)** | **change** | **change** | **change (LNB path)** | **solder** |
-
----
+- [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.de/) under the [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) stand
 
 ## Gallery
-
-[▶ Video](https://drive.google.com/file/d/1cbVlMBV8zS9o48hG52KBiPKmD1HPmWjP/view?usp=drive_link)
 
 ### Finished units
 
@@ -261,9 +203,6 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 <td></td>
 </tr>
 </table>
-
-### Input characterisitics
-
 <table>
 <tr>
 <td align="center"><img src="hw-trv/measurements/trv_s11_tx.png" alt="TX port, s11"><br><em>TRX port on TX, s11</em></td>
@@ -285,14 +224,9 @@ All source code, hardware design files, and documentation are publicly available
 
 | Component | License |
 |---|---|
-| Firmware (`src/`, excluding bundled vendor drivers) | [GPL v2 + commercial exception](LICENSE-CODE) |
+| Firmware (`src/`, excluding bundled vendor drivers) | [PolyForm Noncommercial 1.0.0](LICENSE-CODE) |
 | Hardware design (`hw-trv/`, `hw-companion-box/`), manual, docs/media | [CC BY-NC-SA 4.0](LICENSE-HARDWARE) |
 
 See [LICENSE](LICENSE) for the full overview. Third-party code bundled
 under `src/Drivers/` (ST's STM32 HAL drivers and ARM's CMSIS headers)
 keeps its own original license terms.
-
-`src/Core/Src/rffc5071.c`, `src/Core/Src/rffc5071_spi.c`, and associated
-headers are derived from [HackRF](https://github.com/greatscottgadgets/hackrf)
-by [Great Scott Gadgets](https://greatscottgadgets.com/) and Jared Boone,
-licensed under [GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
