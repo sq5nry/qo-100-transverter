@@ -292,7 +292,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 </tr>
 </table>
 
-### Input characterisitics
+### TRX port
 
 <table>
 <tr>
