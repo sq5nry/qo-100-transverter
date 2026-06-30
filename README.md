@@ -65,6 +65,64 @@
 - [v0.3 schematics (current)](hw-trv/sch_v0.3-sh.pdf)
 - [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in  [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
 
+## Assembly
+
+### Preparation
+
+Gather all parts from the [BOM](hw-trv/BOM.md) and arrange them on your workbench before starting.
+Verify IC orientation markings and keep ESD-sensitive parts (ICs, MOSFETs) in their packaging
+until placement.
+
+### Solder paste application
+
+Apply solder paste through the PCB stencil. Two paste options have been tested:
+
+- **Sn63Pb37** (183°C eutectic, e.g. Mechanic XG-50) — recommended; standard SnPb profile,
+  widely available, easy to work with.
+- **Sn42Bi58** (~138°C eutectic, e.g. ChipQuik SMD291 or Mechanic UV50) — low-melting-point
+  alternative; useful if heat-sensitive components are a concern, but requires careful handling
+  as bismuth alloys are more brittle and less compatible with lead-containing component finishes.
+
+Clamp the stencil firmly over the PCB, apply paste with a squeegee in a single smooth stroke,
+and lift the stencil straight up to avoid smearing. Inspect paste deposits under magnification
+before placing components.
+
+### Component placement
+
+Place all SMD components onto the paste deposits. Work from smallest to largest — passives first,
+then ICs. Pay close attention to pin-1 orientation on all ICs and polarised components.
+QFN packages require careful centring over their pads; the paste surface tension will self-align
+them slightly during reflow.
+
+### Reflow
+
+Place the populated PCB on the heat plate. Follow a standard **SnPb reflow profile**:
+
+| Zone | Temperature | Duration |
+|------|------------|---------|
+| Preheat | 100–150°C | ~60 s |
+| Soak | 150–180°C | 60–90 s |
+| Reflow (above liquidus) | 183–215°C peak | 30–45 s |
+| Cooldown | ramp down | natural |
+
+Use hot air to assist reflow around QFN packages and larger thermal-mass parts (PA, DC-DC
+converter). Watch for bridging on fine-pitch ICs.
+
+### Inspection and rework
+
+After reflow and cooldown, inspect all joints under magnification:
+
+- Remove solder bridges with braid or a fine soldering iron tip.
+- Add solder to any under-filled joints, particularly on exposed thermal pads of QFN/PQFN
+  packages — use a soldering iron with flux through the heat-via holes on the bottom side.
+- The bottom-side thermal vias do not need to be flush; they will be covered by thermal pads
+  connecting to the heat spreader or enclosure floor.
+
+### Through-hole parts
+
+Solder the 5W power resistor by hand after SMD reflow. Mount the TCVCXO with polyester
+tape and foam fitting as described in the enclosure assembly notes.
+
 ## Circuit description
 
 ### Transmit path
@@ -92,8 +150,14 @@ transceiver to compensate.
 
 The STM32L0 microcontroller configures the RFFC2071 PLL for the RX and TX local oscillator
 frequencies corresponding to the IF band selected by the DIP switch. On PTT transitions,
-the firmware switches between the TX and RX PLL register banks in the RFFC2071. The PTT
-signal can originate from a physical PTT line or be detected from the coax (PTT-over-coax).
+the logic switches between the TX and RX PLL register banks in the RFFC2071. The PTT
+signal is a logical OR from the physical PTT line and the coax (PTT-over-coax).
+
+### Indicators
+The blue LED indicates that PLL synthesizer is in locked state. This means that MCU programmed the PLL, the 25MHz reference oscillator is okay and RX/TX LO frequency is generated for mixers.
+The green LED is blinking on RX and lit when in TX. On startup and IF change it blinks as many times as the IF position in the list (1-8).
+
+## Assembly
 
 ## Jumper configuration
 
