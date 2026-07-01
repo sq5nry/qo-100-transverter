@@ -63,7 +63,7 @@
 ## Schematics
 
 - [v0.3 schematics (current)](hw-trv/sch_v0.3-sh.pdf)
-- [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in  [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
+- [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
 
 ## Assembly
 
@@ -130,7 +130,7 @@ them depends on the enclosure:
 
 - **Outdoor version (Hammond 1590XX die-cast aluminium enclosure):** do **not** fit EMI
   shields except over the reference oscillator. The cast enclosure itself provides effective
-  shielding. Fitting additional shields in vicinity of PA can cause instability due to
+  shielding. Fitting additional shields in the vicinity of the PA can cause instability due to
   altered parasitic coupling.
 - **Bare-board, cabinet, and outdoor-deluxe versions:** all EMI shields may be installed.
   They serve primarily as mechanical protection for small components in these configurations.
@@ -177,12 +177,11 @@ Before adjusting, raise the lab supply's overload protection (current limit) to 
 To measure Idq, cut the respective drain supply PCB trace and insert an ammeter in series or just calculate current delta on the lab supply.
 Adjust the bias trimmer for each stage until the target Idq is reached, then bridge the cut
 with solder.
-Try higher settings like 24mA/150mA for possibly better linearity, 1dB more gain but higher power consumption.
-Adjust position of C87 in PA output circuit for highest stage gain.
+Adjust the position of C87 in the PA output circuit for highest stage gain.
 
 ### PA gain and output matching
 
-Measure the PA gain and adjust the position of C88 to obtain **28–30dB** gain. Add 0.8pF in parallel to C88 in case shifting this cap to the end to the thicker part of the output line didn't maximize the gain. Do not mount
+Measure the PA gain and adjust the position of C88 to obtain **28–30dB** gain — slide C88 along the output line toward the thicker section. If that alone does not maximise gain, add 0.8pF in parallel with C88. Do not mount
 the low-pass filter (LPF) elements yet — bridge the LPF inductor footprint with a strip of
 copper foil instead, so the PA output can be measured without the potentially mismatched filter.
 
@@ -216,16 +215,14 @@ even reaches the downstream filter. Although slightly more expensive than a narr
 chip, the wideband transformer's superior symmetry keeps LO leakage below −32dBc relative
 to the upper sideband with only two SAW filters — most critically on the 29MHz band, where
 LO leakage lands closest to occupied spectrum. The TX mixer on 10m is intentionally operated at a reduced bias current, which directly reduces LO leakage at its output. \
-The output is filtered by a 2.4GHz bandpass filter to further suppress any residual LO leakage and the image frequency. The two TX bandpass filters are inter-stage matched using a parallel 0.8pF capacitor; this matching network optimises power transfer between the filter sections and consistently yields a +1dB
-improvement. This node operates at a characteristic
-impedance of 37Ω. A driver stage amplifies the signal to +12dBm,
+The output is filtered by a 2.4GHz bandpass filter to further suppress any residual LO leakage and the image frequency. The two TX bandpass filters are inter-stage matched using a parallel 0.8pF capacitor; this matching network optimises power transfer between the filter sections. The inter-filter node operates at a characteristic impedance of 37Ω. A driver stage amplifies the signal to +12dBm,
 followed by a 29dB LDMOS power amplifier — whose input is matched to 50Ω using a short high-impedance transmission line — and a low-pass filter, delivering +38dBm (6W) to
 the TX output socket. \
 Interstage 1dB and 3dB fixed attenuation pads improve impedance
 matching, distribute gain, and improve amplifier stability. Their 50Ω terminations also
 provide convenient probe attachment points when measuring gain between individual stages. \
 Image attenuation is 40dB on 10m.
-Total conversion gain is 2-9dB, about 0.8-4W from TRX will produce 6W output.
+Total conversion gain is 2–9dB; about 0.8–4W from the transceiver will produce 6W output.
 
 ### Receive path
 
@@ -233,10 +230,12 @@ Both the LNB supply voltage and the 25MHz reference signal (along with its harmo
 The received 738MHz IF from the LNB passes through a high-pass filter (so as not to hammer the input SAW filters with the reference oscillator) and two cascaded SAW
 filters centred around 738MHz, then reaches an optional signal splitter. \
 The signal can be routed to the receive mixer or directed to the external AUX socket. From the mixer output
-the signal passes through a PIN diode switch to the shared TRX socket. \
+the signal passes through a PIN diode switch to the shared TRX socket. The switch's bias-T
+is built from three inductors in series, chosen to present at least 1kΩ of reactance at
+every supported IF band. \
 The input attenuator is always present on the RX path — enable the RX preamplifier in your
-transceiver to compensate. Receive path doesn't add amplification (to keep the cost low) and relies on typical LNB signal level so as not yet to degrade SNR with noise from TX chain. \
-Release v0.2 uses resistive splitter but it's advised to use minimum-loss option as in v0.3-sh. If you don't consider RX AUX output, do not mount the splitter parts.
+transceiver to compensate. The receive path does not add amplification (to keep the cost low) and relies on typical LNB signal levels so as not to degrade the SNR with noise from the TX chain. \
+Release v0.2 uses resistive splitter but it's advised to use minimum-loss option as in v0.3-sh. If you don't need the RX AUX output, do not mount the splitter parts.
 
 ### Control
 
@@ -262,7 +261,7 @@ The green LED blinks in RX mode and is lit continuously in TX mode. On startup a
 | JP4 | RX SPLIT | no-split | Part of RX split — change together with JP2. Change position only if you want RX in AUX socket. |
 | JP5 | OVEN | disconnected | Reserved for OCXO option; disabled in v0.2 |
 | JP6 | REF ROUTE | AUX path | Routes the 25MHz reference toward the AUX socket (default) or toward the LNB feeder (also check JP7) |
-| JP7 | REF TO LNB | open | Solder to mix the 25MHz reference signal into the LNB feeder coax. This jumper enhances signal integrity when REF signal isn't routed to LNB feeder. "Open" when you don't want to mix REF with LNB, "Connected" to inject REF to LNB feeder. |
+| JP7 | REF TO LNB | open | Solder to mix the 25MHz reference signal into the LNB feeder coax. This jumper enhances signal integrity when the REF signal isn't routed to the LNB feeder. "Open" when you don't want to mix the REF with the LNB feeder, "Connected" to inject the REF into the LNB feeder. |
 
 ### Typical usage scenarios
 
@@ -436,8 +435,8 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 <table>
 <tr>
-<td><img src="hw-trv/measurements/tx_if_chain_s21.png" alt="TX IF chain S21"></td>
-<td><img src="hw-trv/measurements/pa_amp_s21.png" alt="PA S21"></td>
+<td><img src="hw-trv/measurements/tx_if_chain_s21.png" alt="TX IF chain S21" width="480"></td>
+<td><img src="hw-trv/measurements/pa_amp_s21.png" alt="PA S21" width="480"></td>
 </tr>
 </table>
 
