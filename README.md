@@ -30,10 +30,10 @@
 - ±0.25 ppm reference oscillator stability
 - 6W of 2.4GHz output power
 - 10m, 6m, 4m, 2m, 70cm bands supported, 5W input power maximum
-- 738MHz receive output for signal supervision
-- 25MHz reference oscillator for LNB: injected into the LNB feeder or a shared output
+- 738MHz filtered, receive output for signal supervision
+- 25MHz reference oscillator for LNB: injected into the LNB feeder or the shared output
 - PTT-over-coax supported
-- Splash-proof outdoor version
+- splash-proof outdoor version
 
 ## Block diagram
 
@@ -64,6 +64,8 @@
 
 - [v0.3 schematics (current)](hw-trv/sch_v0.3-sh.pdf)
 - [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
+
+> **⚠️ Note:** do not mount the OCXO subcircuit (error amplifier and heater components, connected via JP5). This circuitry is non-functional in the current release and will be removed in a future revision. The freed board space can instead be used for additional thermal insulation around the TCXO.
 
 ## Assembly
 
@@ -135,7 +137,7 @@ them depends on the enclosure:
 - **Bare-board, cabinet, and outdoor-deluxe versions:** all EMI shields may be installed.
   They serve primarily as mechanical protection for small components in these configurations.
   For cabinet and outdoor-deluxe versions, fitting RF absorption foam on the inner face of
-  the enclosure lid is strongly recommended — without it, reflections from the lid may
+  the enclosure lid is recommended — without it, reflections from the lid may
   affect PA stability.
 
 ### PCB cleaning
@@ -193,9 +195,9 @@ Set the overload (overcurrent) protection threshold to **1.1A**.
 Connect an RF power meter to the 2.4GHz TX output socket and adjust the TX path for **6W**
 output across your expected input power range (1–5W).
 
-> **⚠️ Warning:** do not increase input power in an attempt to reach 6W until PA gain is at least 28dB. PA chip will overheat and operate non-linearly.
+> **⚠️ Warning:** do not increase input power in an attempt to reach 6W until PA gain is at least 28dB. PA chip will overheat and operate non-linearly. I bricked one PA after overloading its input with just 17dBm.
 
-> **⚠️ Warning:** do not drive the PA past **8W** output — exceeding this limit pushes the
+> **⚠️ Warning:** do not drive the PA past **9..12W** output — exceeding this limit pushes the
 > stage into non-linear operation, causing spectral splatter and interference to other users.
 
 > **⚠️ Note:** the PA chip tolerates antenna mismatch well — SWR up to 10:1 on the 2.4GHz
@@ -231,18 +233,16 @@ The received 738MHz IF from the LNB passes through a high-pass filter (so as not
 From the mixer output the signal passes through a PIN diode switch to the shared TRX socket. The switch's bias-T is built from three inductors in series, chosen to present at least 1kΩ of reactance at
 every supported IF band. \
 The input attenuator is always present on the RX path — enable the RX preamplifier in your
-transceiver to compensate. The receive path does not add amplification (to keep the cost low) and relies on typical LNB signal levels so as not to degrade the SNR with noise from the RX chain.
+transceiver to compensate. The receive path does not add amplification (to keep the cost low) and relies on typical LNB signal levels so as not to degrade the SNR with noise from the RX chain. \
+Nn 70cm IF the strongest signals come at S9 level with RX preamp on, mid-beacon is S7.
 
 ### Control
 
-The STM32L0 microcontroller configures the RFFC2071 PLL for the RX and TX local oscillator
-frequencies corresponding to the IF band selected by the DIP switch. On PTT transitions,
-the logic switches between the TX and RX PLL register banks in the RFFC2071. The PTT
-signal is a logical OR from the physical PTT line and the coax (PTT-over-coax).
+The STM32L0 microcontroller configures the RFFC2071 PLL for the RX and TX frequencies corresponding to the IF band selected by the DIP switch. In addition, mixer bias currents ate also configurd per band. On PTT transitions, the logic switches between the TX and RX PLL register banks in the RFFC2071. The PTT signal is a logical OR from the physical PTT line and the coax (PTT-over-coax).
 
 ### Indicators
 
-The blue LED indicates that the PLL synthesizer is locked — the MCU has configured the PLL, the 25MHz reference is running, and the LO frequency is being generated.
+The blue LED indicates that the PLL synthesizer is locked — the MCU has configured the PLL, the 25MHz reference is running, and the LO frequency is being generated. Mixer bias currents are configured according to IF band.
 
 The green LED blinks in RX mode and is lit continuously in TX mode. On startup and on IF band change, it blinks once per IF position number (1–8).
 
@@ -306,6 +306,14 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 [![Video thumbnail](https://drive.google.com/thumbnail?id=1cbVlMBV8zS9o48hG52KBiPKmD1HPmWjP&sz=w640)](https://drive.google.com/file/d/1cbVlMBV8zS9o48hG52KBiPKmD1HPmWjP/view?usp=drive_link)
 
 *Click the image to watch the video.*
+
+[![Output power video thumbnail](https://drive.google.com/thumbnail?id=1jGGn86MhkM-9hL6HgY638JuyBKbzmVd1&sz=w640)](https://drive.google.com/file/d/1jGGn86MhkM-9hL6HgY638JuyBKbzmVd1/view?usp=drive_link)
+
+*Output power — click to watch. 40dB/50W att. + 20dB SMA att (39.5+19,5=59dB at 2.4GHz)*
+
+[![Infrared video thumbnail](https://drive.google.com/thumbnail?id=16R6eq9bAkn6X3CiZJTOIlDRJh-qXqAGV&sz=w640)](https://drive.google.com/file/d/16R6eq9bAkn6X3CiZJTOIlDRJh-qXqAGV/view?usp=drive_link)
+
+*Infrared video of the PCB during PA test — passive cooling via aluminum enclosure. Click to watch.*
 
 ### Finished units
 
@@ -412,7 +420,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 </tr>
 <tr>
 <td><img src="media/P_20250405_205523.jpg" alt="power supply IC close-up"></td>
-<td></td>
+<td><img src="media/2026-05-30-01-12-42-c3a2c.jpg" alt="C88"><br><em>a cheap C88</em></td>
 </tr>
 </table>
 
@@ -472,7 +480,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 - **SP5E Krzysztof** — for the original idea and other discussions
 - **SQ6QV Tomasz** — for consultation
-- **Colleagues from a Radio Club in DOK Ursynów** — for countless discussions
+- **Colleagues from Radio Club in DOK Ursynów** — for countless discussions
 
 ## License
 

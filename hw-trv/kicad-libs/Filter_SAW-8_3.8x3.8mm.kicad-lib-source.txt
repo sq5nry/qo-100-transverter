@@ -1,0 +1,23 @@
+Third-party KiCad footprint reference
+========================================================
+
+Original file:     Filter_SAW-8_3.8x3.8mm.kicad_mod
+Description:       8-pin 3.8x3.8mm SAW filter footprint
+Datasheet ref:     https://www.golledge.com/media/1831/ma05497.pdf
+
+This footprint is not included in this repository due to uncertain
+redistribution rights of the original source.
+
+To get the file yourself:
+  1. Check the KiCad official footprint library (Filter.pretty):
+     https://github.com/KiCad/kicad-footprints
+  2. Alternatively, recreate it from the Golledge MA05497 datasheet
+     (package outline and pad dimensions).
+  3. Or use SnapEDA / Ultra Librarian:
+     https://www.snapeda.com
+     https://www.ultralibrarian.com
+
+The footprint as actually used in this design is already embedded in
+the project's own .kicad_pcb files -- you only need this file if
+you open the design in KiCad and want the footprint available in the
+library browser.
