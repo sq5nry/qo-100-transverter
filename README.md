@@ -65,6 +65,8 @@
 - [v0.3 schematics (current)](hw-trv/sch_v0.3-sh.pdf)
 - [v0.2 schematics](https://github.com/sq5nry/qo-100-transverter/blob/77cc88346982ab3cb6913bec3531f18df363a01a/hw-trv/sch_v0.2.pdf) — release presented at [Ham Radio Friedrichshafen 2026](https://www.hamradio-friedrichshafen.com/trade-show-program/exhibitors/exhibitor?id=107515806) in [PZK](https://www.pzk.org.pl/) (Polish Amateur Radio Union) tent
 
+> **⚠️ Note:** do not mount the OCXO subcircuit (error amplifier and heater components, connected via JP5). This circuitry is non-functional in the current release and will be removed in a future revision. The freed board space can instead be used for additional thermal insulation around the TCXO.
+
 ## Assembly
 
 ### Preparation
@@ -242,7 +244,7 @@ signal is a logical OR from the physical PTT line and the coax (PTT-over-coax).
 
 ### Indicators
 
-The blue LED indicates that the PLL synthesizer is locked — the MCU has configured the PLL, the 25MHz reference is running, and the LO frequency is being generated.
+The blue LED indicates that the PLL synthesizer is locked — the MCU has configured the PLL, the 25MHz reference is running, and the LO frequency is being generated. Mixer bias currents are configured according to IF band.
 
 The green LED blinks in RX mode and is lit continuously in TX mode. On startup and on IF band change, it blinks once per IF position number (1–8).
 
@@ -472,7 +474,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 - **SP5E Krzysztof** — for the original idea and other discussions
 - **SQ6QV Tomasz** — for consultation
-- **Colleagues from a Radio Club in DOK Ursynów** — for countless discussions
+- **Colleagues from Radio Club in DOK Ursynów** — for countless discussions
 
 ## License
 

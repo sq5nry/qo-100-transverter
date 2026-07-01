@@ -1,0 +1,25 @@
+Third-party KiCad footprint reference
+========================================================
+
+Original file:     Filter_SAW_Epcos_DCC6C_3x3mm.kicad_mod
+Manufacturer:      EPCOS / TDK Electronics
+Description:       6-pin DCC6C SAW filter footprint
+App note ref:      EPCOS Application Note 93
+                   https://www.catagle.com/45-2/PDF_AN93.htm
+
+This footprint is not included in this repository due to uncertain
+redistribution rights of the original source.
+
+To get the file yourself:
+  1. Check the KiCad official footprint library (Filter.pretty):
+     https://github.com/KiCad/kicad-footprints
+  2. Alternatively, recreate it from the EPCOS AN93 app note
+     (package outline and pad dimensions for the DCC6C package).
+  3. Or use SnapEDA / Ultra Librarian:
+     https://www.snapeda.com
+     https://www.ultralibrarian.com
+
+The footprint as actually used in this design is already embedded in
+the project's own .kicad_pcb files -- you only need this file if
+you open the design in KiCad and want the footprint available in the
+library browser.
