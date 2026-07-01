@@ -227,15 +227,11 @@ Total conversion gain is 2–9dB; about 0.8–4W from the transceiver will produ
 ### Receive path
 
 Both the LNB supply voltage and the 25MHz reference signal (along with its harmonics up to 125MHz) are injected via a bias-T, which must provide sufficient RF isolation across the full 25–738MHz range where these signals share the same junction. The reference signal is low-pass filtered to 125MHz before injection. \
-The received 738MHz IF from the LNB passes through a high-pass filter (so as not to hammer the input SAW filters with the reference oscillator) and two cascaded SAW
-filters centred around 738MHz, then reaches an optional signal splitter. \
-The signal can be routed to the receive mixer or directed to the external AUX socket. From the mixer output
-the signal passes through a PIN diode switch to the shared TRX socket. The switch's bias-T
-is built from three inductors in series, chosen to present at least 1kΩ of reactance at
+The received 738MHz IF from the LNB passes through a high-pass filter (so as not to hammer the input SAW filters with the reference oscillator) and two cascaded SAW filters centred around 738MHz. Then follows optional splitter to tap IF to the external RX AUX socket. Release v0.2 uses resistive splitter but it's advised to use minimum-loss option as in v0.3-sh. If you don't need the RX AUX output, do not mount the splitter parts.\
+From the mixer output the signal passes through a PIN diode switch to the shared TRX socket. The switch's bias-T is built from three inductors in series, chosen to present at least 1kΩ of reactance at
 every supported IF band. \
 The input attenuator is always present on the RX path — enable the RX preamplifier in your
-transceiver to compensate. The receive path does not add amplification (to keep the cost low) and relies on typical LNB signal levels so as not to degrade the SNR with noise from the TX chain. \
-Release v0.2 uses resistive splitter but it's advised to use minimum-loss option as in v0.3-sh. If you don't need the RX AUX output, do not mount the splitter parts.
+transceiver to compensate. The receive path does not add amplification (to keep the cost low) and relies on typical LNB signal levels so as not to degrade the SNR with noise from the RX chain.
 
 ### Control
 
