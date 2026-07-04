@@ -1,0 +1,11 @@
+! S11 (input) file
+! Circuit : MHT2012N
+! Author : Paweł Stobiński
+! Date : 01/01/2026
+! File : mht2012n_zin.s1p
+!
+! File Format:
+#	MHz	Z
+	2400	40.9	-23.6
+!
+! End of File

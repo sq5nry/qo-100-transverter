@@ -1,0 +1,418 @@
+/*
+ * Copyright 2012-2022 Great Scott Gadgets <info@greatscottgadgets.com>
+ * Copyright 2014 Jared Boone <jared@sharebrained.com>
+ *
+ * This file is part of HackRF.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
+/*
+ * 'gcc -DTEST -DDEBUG -O2 -o test rffc5071.c' prints out what test
+ * program would do if it had a real spi library
+ */
+
+/*
+ * The actual part on Jawbreaker is the RFFC5072, not the RFFC5071, but the
+ * RFFC5071 may be installed instead.  The only difference between the parts is
+ * that the RFFC5071 includes a second mixer.
+ */
+
+#include <stdint.h>
+#include <string.h>
+#include "rffc5071.h"
+#include "rffc5071_regs.def" // private register def macros
+#include "stm32l0xx_hal.h"
+
+static const uint16_t rffc5071_regs_29M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4200, //0x7E00 0x1200 0x4800, /* 0B MIX_CONT */
+	0x1C24, /* 0C P1_FREQ1 0x2324 */
+	0xD70A, /* 0D P1_FREQ2 0x6276 */
+	0x3D00, /* 0E P1_FREQ3 0x2700 */
+	0x1798, /* 0F P2_FREQ1 0x2f16 */
+	0x6B85, /* 10 P2_FREQ2 0x3b13 */
+	0x1E00, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_50M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x1BA4, /* 0C P1_FREQ1 0x2324 */
+	0x28F5, /* 0D P1_FREQ2 0x6276 */
+	0xC200, /* 0E P1_FREQ3 0x2700 */
+	0x1798, /* 0F P2_FREQ1 0x2f16 */
+	0x0000, /* 10 P2_FREQ2 0x3b13 */
+	0x0000, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_70M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x1AB8, /* 0C P1_FREQ1 0x2324 */
+	0x8F5C, /* 0D P1_FREQ2 0x6276 */
+	0x2800, /* 0E P1_FREQ3 0x2700 */
+	0x1718, /* 0F P2_FREQ1 0x2f16 */
+	0x9999, /* 10 P2_FREQ2 0x3b13 */
+	0x9900, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_51M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x1BA4, /* 0C P1_FREQ1 0x2324 */
+	0x147A, /* 0D P1_FREQ2 0x6276 */
+	0x147A, /* 0E P1_FREQ3 0x2700 */
+	0x1718, /* 0F P2_FREQ1 0x2f16 */
+	0xFAE1, /* 10 P2_FREQ2 0x3b13 */
+	0x4700, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_144M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x17B8, /* 0C P1_FREQ1 0x2324 */
+	0xA3D7, /* 0D P1_FREQ2 0x6276 */
+	0x0A00, /* 0E P1_FREQ3 0x2700 */
+	0x1698, /* 0F P2_FREQ1 0x2f16 */
+	0x1EB8, /* 10 P2_FREQ2 0x3b13 */
+	0x5100, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_145M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x17B8, /* 0C P1_FREQ1 0x2324 */
+	0x8F5C, /* 0D P1_FREQ2 0x6276 */
+	0x2800, /* 0E P1_FREQ3 0x2700 */
+	0x1698, /* 0F P2_FREQ1 0x2f16 */
+	0x1999, /* 10 P2_FREQ2 0x3b13 */
+	0x9900, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_432M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x18C8, /* 0C P1_FREQ1 0x2324 */
+	0x3333, /* 0D P1_FREQ2 0x6276 */
+	0x3300, /* 0E P1_FREQ3 0x2700 */
+	0x1398, /* 0F P2_FREQ1 0x2f16 */
+	0x5C28, /* 10 P2_FREQ2 0x3b13 */
+	0xF500, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+static const uint16_t rffc5071_regs_1296M[RFFC5071_NUM_REGS] = {
+	0xbefa, /* 00 LF */
+	0x4064, /* 01 XO */
+	0x9055, /* 02 CAL_TIME 0x9055 */
+	0x2d02, /* 03 VCO_CTRL */
+	0xb0bf, /* 04 CT_CAL1 0xb0bf */
+	0xb0bf, /* 05 CT_CAL2 0xb0bf */
+	0x0028, /* 06 PLL_CAL1 */
+	0x0028, /* 07 PLL_CAL2 */
+	0xFC06, /* 08 VCO_AUTO 0xFC06 */
+	0x8220, /* 09 PLL_CTRL */
+	0x0202, /* 0A PLL_BIAS */
+	0x4E00, /* 0B MIX_CONT */
+	0x1638, /* 0C P1_FREQ1 0x2324 */
+	0x872B, /* 0D P1_FREQ2 0x6276 */
+	0x0200, /* 0E P1_FREQ3 0x2700 */
+	0x1628, /* 0F P2_FREQ1 0x2f16 */
+	0x28F5, /* 10 P2_FREQ2 0x3b13 */
+	0xC200, /* 11 P2_FREQ3 0xb100 */
+	0x2a80, /* 12 FN_CTRL */
+	0x0000, /* 13 EXT_MOD */
+	0x0000, /* 14 FMOD */
+	0x0000, /* 15 SDI_CTRL */
+	0x0000, /* 16 GPO */
+	0x4900, /* 17 T_VCO */
+	0x0281, /* 18 IQMOD1 0x0283 */
+	0xf00f, /* 19 IQMOD2 */
+	0x0000, /* 1A IQMOD3 */
+	0x0005, /* 1B IQMOD4 */
+	0xC840, /* 1C T_CTRL */
+	0x1000, /* 1D DEV_CTRL */
+	0x0005, /* 1E TEST 0x0001 */};
+
+/* Set up all registers according to defaults specified in docs. */
+void rffc5071_init(rffc5071_driver_t *const drv, BAND_IF band) {
+	if (band == BAND_29M) {
+		memcpy(drv->regs, rffc5071_regs_29M, sizeof(drv->regs));
+	} else if (band == BAND_50M) {
+		memcpy(drv->regs, rffc5071_regs_50M, sizeof(drv->regs));
+	} else if (band == BAND_51M) {
+		memcpy(drv->regs, rffc5071_regs_51M, sizeof(drv->regs));
+	} else if (band == BAND_70M) {
+		memcpy(drv->regs, rffc5071_regs_70M, sizeof(drv->regs));
+	} else if (band == BAND_144M) {
+		memcpy(drv->regs, rffc5071_regs_144M, sizeof(drv->regs));
+	} else if (band == BAND_145M) {
+		memcpy(drv->regs, rffc5071_regs_145M, sizeof(drv->regs));
+	} else if (band == BAND_432M) {
+		memcpy(drv->regs, rffc5071_regs_432M, sizeof(drv->regs));
+	} else if (band == BAND_1296M) {
+		memcpy(drv->regs, rffc5071_regs_1296M, sizeof(drv->regs));
+	} else {
+		memcpy(drv->regs, rffc5071_regs_29M, sizeof(drv->regs));
+	}
+
+	drv->regs_dirty = 0x7fffffff;
+
+	/* Write default register values to chip. */
+	rffc5071_regs_commit(drv);
+}
+
+
+static inline void rffc5071_reg_commit(rffc5071_driver_t *const drv, uint8_t r);
+static uint16_t rffc5071_spi_read(rffc5071_driver_t *const drv, uint8_t r);
+
+/*
+ * Set up pins for GPIO and SPI control, configure SSP peripheral for SPI, and
+ * set our own default register configuration.
+ */
+void rffc5071_setup(rffc5071_driver_t *const drv, BAND_IF band) {
+	rffc5071_init(drv, band);
+
+	/* lock detect flag to gpo4 */
+	set_RFFC5071_LOCK(drv, 1);
+
+	/* set ENBL and MODE to be configured via 3-wire interface,
+	 * not control pins. */
+	set_RFFC5071_SIPIN(drv, 1);
+
+	/* GPOs are active at all times */
+	set_RFFC5071_GATE(drv, 1);
+
+	set_RFFC5071_FULLD(drv, 0);
+
+	rffc5071_regs_commit(drv);
+}
+
+static uint16_t rffc5071_spi_read(rffc5071_driver_t *const drv, uint8_t r) {
+	uint16_t data[] = {0x80 | (r & 0x7f), 0xffff};
+	spi_bus_transfer(drv->bus, data, 2);
+	return data[1];
+}
+
+void rffc5071_spi_write(rffc5071_driver_t *const drv, uint8_t r, uint16_t v) {
+	uint16_t data[] = {0x00 | (r & 0x7f), v};
+	spi_bus_transfer(drv->bus, data, 2);
+}
+
+uint16_t rffc5071_reg_read(rffc5071_driver_t *const drv, uint8_t r) {
+	/* Readback register is not cached. */
+	if (r == RFFC5071_READBACK_REG) {
+		return rffc5071_spi_read(drv, r);
+	}
+
+	/* Discard uncommited write when reading. This shouldn't
+	 * happen, and probably has not been tested. */
+	if ((drv->regs_dirty >> r) & 0x1) {
+		drv->regs[r] = rffc5071_spi_read(drv, r);
+	};
+	return drv->regs[r];
+}
+
+void rffc5071_reg_write(rffc5071_driver_t *const drv, uint8_t r, uint16_t v) {
+	drv->regs[r] = v;
+	rffc5071_spi_write(drv, r, v);
+	RFFC5071_REG_SET_CLEAN(drv, r);
+}
+
+static inline void rffc5071_reg_commit(rffc5071_driver_t *const drv, uint8_t r) {
+	rffc5071_reg_write(drv, r, drv->regs[r]);
+}
+
+void rffc5071_regs_commit(rffc5071_driver_t *const drv) {
+	int r;
+	for (r = 0; r < RFFC5071_NUM_REGS; r++) {
+		if ((drv->regs_dirty >> r) & 0x1) {
+			rffc5071_reg_commit(drv, r);
+		}
+	}
+}
+
+void rffc5071_tx(rffc5071_driver_t *const drv) {
+	set_RFFC5071_ENBL(drv, 0);
+	set_RFFC5071_MODE(drv, 1);
+	rffc5071_regs_commit(drv);
+
+	set_RFFC5071_ENBL(drv, 1);
+	rffc5071_regs_commit(drv);
+}
+
+void rffc5071_rx(rffc5071_driver_t *const drv) {
+	set_RFFC5071_ENBL(drv, 0);
+	set_RFFC5071_MODE(drv, 0);
+	rffc5071_regs_commit(drv);
+
+	set_RFFC5071_ENBL(drv, 1);
+	rffc5071_regs_commit(drv);
+}

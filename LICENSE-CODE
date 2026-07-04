@@ -1,0 +1,39 @@
+# GNU General Public License v2 + Commercial Exception
+
+## License
+
+The firmware source code in `src/` authored by Paweł Stobiński
+(https://github.com/sq5nry) is licensed under the GNU General Public
+License version 2 (GPL v2):
+
+  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+This includes the application code under `src/Core/` (excluding
+third-party files listed below) and build/project configuration files.
+
+You are free to use, study, modify, and redistribute this firmware
+under the terms of the GPL v2.
+
+## Commercial Exception
+
+**Commercial use requires a separate written licence from the author.**
+
+For the purpose of this exception, "commercial use" means any use
+of this firmware, in whole or in part, in a product or service
+offered for sale, or in an internal production or manufacturing
+process, for monetary gain. Amateur radio use, personal builds,
+club builds, and non-profit educational use are explicitly permitted
+under the GPL v2 without requiring this exception.
+
+To obtain a commercial licence, contact: sq5nry@gmail.com
+
+## Third-party components
+
+- `src/Core/Src/rffc5071.c`, `src/Core/Src/rffc5071_spi.c`, and
+  associated headers: Copyright 2012–2022 Great Scott Gadgets and
+  Jared Boone. Derived from HackRF (https://github.com/greatscottgadgets/hackrf).
+  Licensed under GPL v2.
+
+- `src/Drivers/` (ST's STM32 HAL drivers and ARM's CMSIS headers):
+  remains under its own original license terms — see the LICENSE
+  files inside those vendor directories.

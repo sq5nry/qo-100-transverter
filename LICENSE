@@ -1,0 +1,31 @@
+qo-100-transverter (c) by Paweł Stobiński (https://github.com/sq5nry)
+
+This project is dual-licensed by component:
+
+  - Firmware source code (`src/`, excluding bundled third-party
+    vendor drivers) is licensed under the
+    GNU General Public License version 2 (GPL v2) with a
+    commercial exception requiring a separate written licence
+    from the author for any commercial use.
+    See: LICENSE-CODE
+
+  - Hardware design files (`hw-trv/`, `hw-companion-box/`),
+    the manual, and documentation/media are licensed under
+    Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+    International (CC BY-NC-SA 4.0).
+    See: LICENSE-HARDWARE
+
+Both licenses permit free use, modification, and redistribution
+for noncommercial purposes only. Commercial use of any part of
+this project is not permitted without the author's separate
+written permission.
+
+Third-party code bundled under `src/Drivers/` (ST's STM32 HAL
+drivers and ARM's CMSIS headers) remains under its own original
+license terms; see the LICENSE files inside those directories.
+
+`src/Core/Src/rffc5071.c`, `src/Core/Src/rffc5071_spi.c`, and
+associated headers are derived from HackRF
+(https://github.com/greatscottgadgets/hackrf) by Great Scott Gadgets
+and Jared Boone, and are licensed under the GNU General Public
+License version 2 (GPL v2). See: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
