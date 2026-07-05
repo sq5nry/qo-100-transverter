@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# qo-100-transverter
-=======
 # qo-100-transverter
 
 [![Hardware: CC BY-NC-SA 4.0](https://img.shields.io/badge/Hardware-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE-HARDWARE)
@@ -130,18 +127,12 @@ tape and foam fitting as described in the enclosure assembly notes.
 
 ### EMI shields
 
-The PCB has footprints for SMD metal EMI shields over sensitive sections. Whether to fit
-them depends on the enclosure:
+The PCB has footprints for SMD metal EMI shields over sensitive sections. Mounting the shield over the IF Unit is important for stability. Shielding the switched-mode power supply section and TCXO is recommended but not critical.
 
-- **Outdoor version (Hammond 1590XX die-cast aluminium enclosure):** do **not** fit EMI
-  shields except over the reference oscillator. The cast enclosure itself provides effective
-  shielding. Fitting additional shields in the vicinity of the PA can cause instability due to
-  altered parasitic coupling.
-- **Bare-board, cabinet, and outdoor-deluxe versions:** all EMI shields may be installed.
-  They serve primarily as mechanical protection for small components in these configurations.
-  For cabinet and outdoor-deluxe versions, fitting RF absorption foam on the inner face of
-  the enclosure lid is recommended — without it, reflections from the lid may
-  affect PA stability.
+### EMI absorber
+
+Most of enclosure types require absorption foams in PA area to help suppress self-oscillations and minimize parasitic coupling between stages. The amplifier may start self-oscillations at a frequency between 2.2-2.5GHz with full power without the absorber. \
+See gallery section for a poor's-man approach.
 
 ### PCB cleaning
 
@@ -318,6 +309,10 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 *Infrared video of the PCB during PA test — passive cooling via aluminum enclosure. Click to watch.*
 
+[![Power measurements video thumbnail](https://drive.google.com/thumbnail?id=1BobpsWnM3RhQmgtJEgMQ4XA69L-facsb&sz=w640)](https://drive.google.com/file/d/1BobpsWnM3RhQmgtJEgMQ4XA69L-facsb/view?usp=drive_link)
+
+*Power measurements — click to watch. Heat-pipe directly at PA.*
+
 ### Finished units
 
 <table>
@@ -402,6 +397,19 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 </tr>
 </table>
 
+### EMI absorbers
+
+<table>
+<tr>
+<td><img src="media/P_20260705_020045.jpg" alt="EMC absorber fitting"></td>
+<td><img src="media/P_20260705_020213.jpg" alt="EMC absorber detail"></td>
+</tr>
+<tr>
+<td><img src="media/P_20260705_140738.jpg" alt="EMC absorber installed"></td>
+<td><img src="media/P_20260705_203015.jpg" alt="EMC absorber completed"></td>
+</tr>
+</table>
+
 ### Development and testing
 
 <table>
@@ -471,9 +479,13 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 > **⚠️ Note:** TX SWR on 23cm is high. Only RX has been tested and confirmed on this band. Proper TX 23cm testing is in progress — it may work with ALC-limited power from your transceiver.
 
-### RX filter
+### RF filtering
 
-![739MHz dual SAW filter S21](hw-trv/measurements/739M_2xSAW_s21.png)
+![two 739MHz filters cascaded incl. balun loss](hw-trv/measurements/739M_2xSAW_s21.png)
+*two 739MHz filters cascaded incl. balun loss*
+
+![wideband RX characteristics from F socket to mixer incl. the high-pass filter input](media/rx_if_filters_lnb_socket_to_mix_in_no_shielding_with_HPF.png)
+*wideband RX characteristics from F socket to mixer incl. the high-pass filter. No shielding of IF Unit.*
 
 ### TCVCXO output spectrum
 
