@@ -18,12 +18,11 @@
 - VNA+SA and a signal generator up to 3GHz minimum
 - Pluto-like SDR to receive, measure, and generate signals during tests and adjustments
 - RF power meter
-- RF personal protective equipment rated to attenuate 2.4 GHz frequencies
 - 30V 5A lab power supply with over-current protection
 - ST-link programmer
 - patience for drilling holes in aluminum enclosure
 - patience for tapping 3 mm holes
-- set of sockets (N, F, DC+PTT, UFL)
+- RF personal protective equipment rated to attenuate 2.4 GHz frequencies
 
 ## Features
 - QO-100 narrow-band transponder SSB, CW, and Data operation with an HF-VHF transceiver
@@ -228,7 +227,7 @@ From the mixer output the signal passes through a PIN diode switch to the shared
 every supported IF band. \
 The input attenuator is always present on the RX path — enable the RX preamplifier in your
 transceiver to compensate. The receive path does not add amplification (to keep the cost low) and relies on typical LNB signal levels so as not to degrade the SNR with noise from the RX chain. \
-Nn 70cm IF the strongest signals come at S9 level with RX preamp on, mid-beacon is S7.
+On 70cm IF the strongest signals come at S9 level with RX preamp on, mid-beacon is S7.
 
 ### Control
 
