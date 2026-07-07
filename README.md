@@ -5,7 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/sq5nry/qo-100-transverter?style=social)](https://github.com/sq5nry/qo-100-transverter/stargazers)
 
 ## What it's about
-- source-available, hardware and software project of a SAT transverter. The outdoor version takes 1.5 days to assemble starting from bare PCB, bag of parts, and patience.
+- source-available, hardware and software project of a transverter for the [QO-100](https://amsat-uk.org/satellites/geo/eshail-2/) satellite. The outdoor version takes 1.5 days to assemble starting from bare PCB, bag of parts, and patience.
 - complete up and down-converter below 199,99 € : [see the BOM](hw-trv/BOM.md)
 - in-fab assembly automation in progress (*v0.3-snapshot*)
 
@@ -45,11 +45,11 @@
 
 - 28V DC power supply offering 1.1A (31W), or
 - 13.8V DC at 3.5A and using the Companion Box for voltage boost
-- Minimum 60cm dish antenna suggested with 5W ERP according to AMSAT guidelines
-- Standard universal LNB (13/18V), 500mA fused
-- Standard PTT ground-to-transmit, or
+- 60cm dish antenna suggested with 5W ERP according to AMSAT guidelines
+- standard universal LNB (13/18V), 500mA fused
+- standard PTT ground-to-transmit, or
 - PTT-over-coax by transceiver or using the Companion Box to mix PTT and RF
-- Operation from 13.8V (1.1A) directly is possible with lower output power (2W max). Adequate linearity is not guaranteed.
+- operation from 13.8V (1.1A) directly is possible with lower output power (2W max). Adequate linearity is not guaranteed.
 
 ### Basic procedures
 
@@ -317,16 +317,16 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 <table>
 <tr>
-<td><img src="media/enclosures.JPG" alt="various realizations"></td>
-<td><img src="media/DSC_1662.JPG" alt="shack version"></td>
+<td><img src="media/enclosures.JPG" alt="various realizations"><br><em>cabinet, outdoor classic, outdoor mini, bare bone</em></td>
+<td><img src="media/DSC_1662.JPG" alt="shack version"><br><em>cabinet version</em></td>
 </tr>
 <tr>
-<td><img src="media/DSC_1681.JPG" alt="outdoor deluxe"></td>
-<td><img src="media/companion_box.JPG" alt="companion box"></td>
+<td><img src="media/DSC_1681.JPG" alt="outdoor small"><br><em>outdoor mini</em></td>
+<td><img src="media/companion_box.JPG" alt="companion box"><br><em>Companion Box</em></td>
 </tr>
 <tr>
-<td><img src="media/DSC_1663.JPG" alt="front panel — IF switch and DC+PTT connector"></td>
-<td></td>
+<td><img src="media/DSC_1663.JPG" alt="cabinet version, back plate"><br><em>cabinet version, back plate</em></td>
+<td><img src="media/P_20260707_175807.jpg" alt="cabinet tiny"><br><em>cabinet mini</em></td>
 </tr>
 </table>
 
@@ -334,16 +334,16 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 <table>
 <tr>
-<td><img src="media/DSC_1679.JPG" alt="shack version inside"></td>
-<td><img src="media/DSC_1674.JPG" alt="outdoor version inside"></td>
+<td><img src="media/DSC_1679.JPG" alt="cabinet version inside"><br><em>cabinet version</em></td>
+<td><img src="media/DSC_1674.JPG" alt="outdoor classic inside"><br><em>outdoor classic</em></td>
 </tr>
 <tr>
-<td><img src="media/P_20260605_232504.jpg" alt="shack unit open during integration"></td>
-<td><img src="media/P_20260608_010719.jpg" alt="shack unit half-open"></td>
+<td><img src="media/P_20260605_232504.jpg" alt="cabinet version during integration"><br><em>cabinet version</em></td>
+<td><img src="media/P_20260608_010719.jpg" alt="cabinet version open"><br><em>cabinet version</em></td>
 </tr>
 <tr>
-<td><img src="media/P_20260512_150707.jpg" alt="companion box wiring"></td>
-<td><img src="media/DSC_1675.JPG" alt="outdoor deluxe open"></td>
+<td><img src="media/P_20260512_150707.jpg" alt="Companion Box proof-of-concept"><br><em>Companion Box proof-of-concept</em></td>
+<td><img src="media/DSC_1675.JPG" alt="outdoor mini open"><br><em>outdoor mini</em></td>
 </tr>
 </table>
 
@@ -384,7 +384,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 
 <table>
 <tr>
-<td><img src="media/P_20260527_001843_1.jpg" alt="2.4GHz TX section"></td>
+<td><img src="media/P_20260527_001843_1.jpg" alt="2.8GHz low-pass filter"><br><em>2.8GHz low-pass filter</em></td>
 <td><img src="media/P_20260609_180522.jpg" alt="PCB bottom side"></td>
 </tr>
 <tr>
@@ -392,7 +392,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 <td><img src="media/DSC_1671.JPG" alt="bare populated v0.2 PCB"></td>
 </tr>
 <tr>
-<td><img src="media/P_20260522_161048.jpg" alt="IC after rework"></td>
+<td><img src="media/P_20260522_161048.jpg" alt="replacing IF chip"><br><em>replacing IF chip</em></td>
 <td><img src="hw-trv/pcb_all_layers.png" alt="PCB all layers"></td>
 </tr>
 </table>
@@ -431,7 +431,7 @@ Combines use cases 2 and 3: LNB gets its reference via coax, AUX socket carries 
 </tr>
 <tr>
 <td><img src="media/P_20250405_205523.jpg" alt="power supply IC close-up"></td>
-<td><img src="media/2026-05-30-01-12-42-c3a2c.jpg" alt="C88"><br><em>a cheap C88</em></td>
+<td><img src="media/2026-05-30-01-12-42-c3a2c.jpg" alt="C88"><br><em>a cheap C88 (ordinary ceramic instead of ATC porcelain one)</em></td>
 </tr>
 </table>
 
