@@ -4,6 +4,8 @@
 [![Firmware: GPL v2](https://img.shields.io/badge/Firmware-GPL%20v2%20%2B%20commercial%20exception-blue.svg)](LICENSE-CODE)
 [![GitHub stars](https://img.shields.io/github/stars/sq5nry/qo-100-transverter?style=social)](https://github.com/sq5nry/qo-100-transverter/stargazers)
 
+*[Wersja polska / Polish version](README_PL.md)*
+
 ## What it's about
 - source-available, hardware and software project of a transverter for the [QO-100](https://amsat-uk.org/satellites/geo/eshail-2/) satellite. The outdoor version takes 1.5 days to assemble starting from bare PCB, bag of parts, and patience.
 - complete up and down-converter below 199,99 € : [see the BOM](hw-trv/BOM.md)
@@ -210,11 +212,9 @@ even reaches the downstream filter. Although slightly more expensive than a narr
 chip, the wideband transformer's superior symmetry keeps LO leakage below −32dBc relative
 to the upper sideband with only two SAW filters — most critically on the 29MHz band, where
 LO leakage lands closest to occupied spectrum. The TX mixer on 10m is intentionally operated at a reduced bias current, which directly reduces LO leakage at its output. \
-The output is filtered by a 2.4GHz bandpass filter to further suppress any residual LO leakage and the image frequency. The two TX bandpass filters are inter-stage matched using a parallel 0.8pF capacitor; this matching network optimises power transfer between the filter sections. The inter-filter node operates at a characteristic impedance of 37Ω. A driver stage amplifies the signal to +12dBm,
-followed by a 29dB LDMOS power amplifier — whose input is matched to 50Ω using a short high-impedance transmission line — and a low-pass filter, delivering +38dBm (6W) to
+The output is filtered by a 2.4GHz bandpass filter to further suppress any residual LO leakage and the image frequency. The two TX bandpass filters are inter-stage matched using a parallel 0.8pF capacitor; this matching network optimises power transfer between the filter sections. A driver stage amplifies the signal to +12dBm, followed by a 29dB LDMOS power amplifier — whose input is matched to 50Ω using a short high-impedance transmission line — and a low-pass filter, delivering +38dBm (6W) to
 the TX output socket. \
-Interstage 1dB and 3dB fixed attenuation pads improve impedance
-matching, distribute gain, and improve amplifier stability. Their 50Ω terminations also
+1dB and 3dB fixed attenuation pads improve impedance matching, distribute gain, and improve amplifier stability. Their 50Ω terminations also
 provide convenient probe attachment points when measuring gain between individual stages. \
 Image attenuation is 40dB on 10m.
 Total conversion gain is 2–9dB; about 0.8–4W from the transceiver will produce 6W output.
