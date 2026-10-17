@@ -40,6 +40,9 @@
 
 /* n=name, r=regnum, o=offset (bits from LSB) of LSB of field,
  * l=length (bits) */
+/* A file may define its own __MREG__ before including this one to
+ * generate something else from the field list (see rffc5071.c). */
+#ifndef __MREG__
 #define __MREG__(n,r,o,l) \
 static inline uint16_t get_##n(rffc5071_driver_t* const _d) { \
         return (_d->regs[r] >> o) & ((1L<<l)-1); \
@@ -49,6 +52,7 @@ static inline void set_##n(rffc5071_driver_t* const _d, uint16_t v) {      \
 	_d->regs[r] |= (uint16_t)(((v&((1L<<l)-1))<<o));	\
 	RFFC5071_REG_SET_DIRTY(_d, r);				\
 }
+#endif
 
 
 /* REG 00 (0): LF */
@@ -79,7 +83,7 @@ __MREG__(RFFC5071_XOI1,3,6,1)
 __MREG__(RFFC5071_KVPOL,3,7,1)
 __MREG__(RFFC5071_KVRNG,3,8,1)
 __MREG__(RFFC5071_KVAVG,3,9,2)
-__MREG__(RFFC5071_CLKPL,3,1,1)
+__MREG__(RFFC5071_CLKPL,3,11,1)   /* bit 11 per register map guide */
 __MREG__(RFFC5071_CTPOL,3,12,1)
 __MREG__(RFFC5071_CTAVG,3,13,2)
 __MREG__(RFFC5071_XTVCO,3,15,1)
@@ -144,7 +148,7 @@ __MREG__(RFFC5071_P1N,12,7,9)
 /* REG 0D (13): P1_FREQ2 */ /* !!!!! CHECK FOR OVERFLOW !!!!! */
 __MREG__(RFFC5071_P1NMSB,13,0,16)
 
-/* REG 0E (14): P1_FREQ3 */
+/* REG 0E (14): P1_FREQ3 -- bits 7:0 n/a */
 __MREG__(RFFC5071_P1NLSB,14,8,8)
 
 /* REG 0F (15): P2_FREQ1 */
@@ -156,7 +160,7 @@ __MREG__(RFFC5071_P2N,15,7,9)
 /* REG 10 (16): P2_FREQ2 */ /* !!!!! CHECK FOR OVERFLOW !!!!! */
 __MREG__(RFFC5071_P2NMSB,16,0,16)
 
-/* REG 11 (17): P2_FREQ3 */
+/* REG 11 (17): P2_FREQ3 -- bits 7:0 n/a */
 __MREG__(RFFC5071_P2NLSB,17,8,8)
 
 /* REG 12 (18): FN_CTRL */
@@ -221,6 +225,7 @@ __MREG__(RFFC5071_BUFDACQ,26,4,6)
 __MREG__(RFFC5071_BUFDACI,26,10,6)
 
 /* REG 1B (27): IQMOD4 */
+__MREG__(RFFC5071_IQMOD4_B10,27,0,2)  /* bits 1:0 undocumented; IQMOD1..4 are RFMD2080-only (no effect on RFFC2071) */
 __MREG__(RFFC5071_BUFBIAS2,27,2,2)
 __MREG__(RFFC5071_BUFBIAS1,27,4,2)
 __MREG__(RFFC5071_MODDACQ,27,6,6)

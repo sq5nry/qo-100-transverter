@@ -48,6 +48,7 @@
 /* USER CODE BEGIN PV */
 volatile uint16_t rffc_readback;     // last raw readback value (watch in debugger)
 volatile uint32_t rffc_unlock_count; // how many times LD was found 0
+volatile uint16_t rffc_spi_selftest; // raw read of LF (0x00) after setup, expect 0xBEFA
 
 /* USER CODE END PV */
 
@@ -130,6 +131,9 @@ int main(void)
   rffc5071_driver_t* mix = mixer_bus_setup();
   rffc5071_setup(mix, band);
 
+  // SPI read bit-alignment check: 0xBEFA = OK, 0x7DF4/0x7DF5 = one bit late
+  rffc_spi_selftest = rffc5071_reg_read_raw(mix, 0x00);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,10 +183,9 @@ int main(void)
 			rffc_readback = rffc5071_reg_read(mix, 31); // readback reg, READSEL=0001
 			bool locked = (rffc_readback >> 15) & 0x1;  // bit 15 = LD
 			if (!locked) {
-				// PLL unlocked: reprogram chip for current band and re-enable in RX
+				// PLL unlocked: recalibrate VCO and relock, keeps RX/TX mode
 				rffc_unlock_count++;
-				rffc5071_setup(mix, band);
-				rffc5071_rx(mix);
+				rffc5071_relock(mix);
 			}
 		}
 

@@ -64,6 +64,12 @@ extern uint16_t rffc5071_reg_read(rffc5071_driver_t *const drv, uint8_t r);
 extern void rffc5071_reg_write(rffc5071_driver_t *const drv, uint8_t r,
 		uint16_t v);
 
+/* Recalibrate VCO and relock PLL in current mode (PLL_CTRL:relok). */
+extern void rffc5071_relock(rffc5071_driver_t *const drv);
+
+/* Uncached SPI read of register r (bypasses driver cache). */
+extern uint16_t rffc5071_reg_read_raw(rffc5071_driver_t *const drv, uint8_t r);
+
 /* Read PLL lock-detect (LD) bit from readback register. 1 = locked. */
 extern bool rffc5071_lock_detect(rffc5071_driver_t *const drv);
 
